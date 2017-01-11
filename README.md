@@ -1,8 +1,8 @@
-# AutoSchema
+# AutLOSchema
 
 ![Build Status](https://travis-ci.org/coursera/autoschema.svg?branch=master)
 
-## Generate JSON Schema from Scala classes!
+## Generate JSON Schema from Scala classes! Integrate shamelessly with LO!
 
 Features
 
@@ -23,7 +23,7 @@ Unsupported Features
 ## Installation
 Add this line to your `build.sbt`:
 
-        libraryDependencies += "org.coursera" %% "autoschema" % "0.1"
+        libraryDependencies += "com.learningobjects.org.coursera" %% "autoschema" % "0.1"
 
 ## Usage
 With a type parameter
@@ -70,7 +70,7 @@ Lets you hide a value in generated schema
 
         case class MyType(@Term.Hide mySecretField: Int)
 
-Copyright 2014 Coursera Inc.
+Copyright 2014 Coursera Inc. Modifications by Learning Objects, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
