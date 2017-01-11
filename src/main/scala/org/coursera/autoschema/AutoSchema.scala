@@ -124,7 +124,6 @@ object AutoSchema {
     // Check if schema for this class has already been generated
     classSchemaCache.getOrElseUpdate(tpe.typeSymbol.fullName, {
       val title = tpe.typeSymbol.name.decodedName.toString
-      println(s"$title: ")
       val propertiesList: Seq[(String, JsonNode)] = tpe.members.flatMap { member =>
         if (member.isTerm && !isHidden(member.asTerm) && !(member.owner == ru.symbolOf[Object])) {
           val term = member.asTerm
@@ -135,7 +134,6 @@ object AutoSchema {
               Some(term.name.decodedName.toString.trim)
             } else None
           propName.map { name =>
-            println(s" - $propName")
             val termFormat = term.annotations.find(isFormatAnnotation)
               .map(formatAnnotationJson)
               .getOrElse {

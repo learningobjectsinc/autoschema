@@ -4,7 +4,7 @@ enablePlugins(DECommonSettings)
 
 name := "autoschema"
 
-organization := "org.coursera"
+organization := "com.learningobjects.org.coursera"
 
 scalaVersion := "2.12.1"
 
