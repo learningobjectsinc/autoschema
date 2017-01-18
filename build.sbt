@@ -28,9 +28,9 @@ scalacOptions -= "-Xfatal-warnings"
 //artifactory configurations
 publishTo := {
   if (isSnapshot.value)
-    Some("LO Misc" at "https://learningobjects.artifactoryonline.com/learningobjects/lo-misc")
+    Some("LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc")
   else
     Some(
-      "LO Misc" at "https://learningobjects.artifactoryonline.com/learningobjects/lo-misc;build.timestamp=" + new java.util.Date().getTime
+      "LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc;build.timestamp=" + new java.util.Date().getTime
     )
 }
