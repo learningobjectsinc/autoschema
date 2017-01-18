@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import org.coursera.autoschema.jackson._
 
+import scala.collection.MapLike
 import scala.reflect.runtime.{universe => ru}
 
 /**
@@ -197,6 +198,12 @@ object AutoSchema {
       // Option[T] becomes the schema of T with required set to false
       val jsonOption = JsObject("required" -> false) ++ createSchema(tpe.asInstanceOf[ru.TypeRefApi].args.head, previousTypes)
       addDescription(tpe, jsonOption)
+    } else if (tpe.baseClasses.contains(ru.symbolOf[MapLike[_, _, _]])) {
+      val jsonMap = JsObject(
+        "type" -> "object",
+        "additionalProperties" -> createSchema(tpe.typeArgs(1))
+      )
+      addDescription(tpe, jsonMap)
     } else if (tpe.baseClasses.exists(s => s.fullName == "scala.collection.Traversable" ||
                                            s.fullName == "scala.Array" ||
                                            s.fullName == "scala.Seq" ||

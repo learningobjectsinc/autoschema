@@ -54,6 +54,8 @@ case class MutuallyRecursiveTypeTwo(param1: MutuallyRecursiveTypeOne)
 @Description("Type description")
 case class TypeWithDescription(@Term.Description("Parameter description") param1: String)
 
+case class TypeWithMap(map: Map[String, TypeOne])
+
 class AutoSchemaTest extends AssertionsForJUnit {
   implicit val om: ObjectMapper = new ObjectMapper().registerModule(new DefaultScalaModule)
 
@@ -217,6 +219,31 @@ class AutoSchemaTest extends AssertionsForJUnit {
             "type" -> "string",
             "description" -> "Parameter description")),
         "description" -> "Type description"))
+  }
+
+  @Test
+  def mapType: Unit = {
+    assert(createSchema[TypeWithMap] ===
+      JsObject(
+        "title" -> "TypeWithMap",
+        "type" -> "object",
+        "properties" -> JsObject(
+          "map" -> JsObject(
+            "type" -> "object",
+            "additionalProperties" -> JsObject(
+              "title" -> "TypeOne",
+              "type" -> "object",
+              "properties" -> JsObject(
+                "param1" -> JsObject(
+                  "type" -> "number",
+                  "format" -> "number"
+                )
+              )
+            )
+          )
+        )
+      )
+    )
   }
 
   @Test
