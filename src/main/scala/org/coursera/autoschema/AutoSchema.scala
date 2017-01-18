@@ -45,10 +45,10 @@ object AutoSchema {
     case "org.joda.time.DateTime" => JsObject("type" -> "string", "format" -> "date")
     case "java.util.Date" => JsObject("type" -> "string", "format" -> "date")
     case "java.lang.String" => JsObject("type" -> "string")
-    case "scala.Boolean" => JsObject("type" -> "boolean")
-    case "scala.Int" => JsObject("type" -> "number", "format" -> "number")
-    case "scala.Long" => JsObject("type" -> "number", "format" -> "number")
-    case "scala.Double" => JsObject("type" -> "number", "format" -> "number")
+    case "scala.Boolean" | "java.lang.Boolean" => JsObject("type" -> "boolean")
+    case "scala.Int" | "java.lang.Integer" => JsObject("type" -> "number", "format" -> "number")
+    case "scala.Long" | "java.lang.Long" => JsObject("type" -> "number", "format" -> "number")
+    case "scala.Double" | "java.lang.Double" => JsObject("type" -> "number", "format" -> "number")
     case "java.util.UUID" => JsObject(
       "type" -> "string",
       "pattern" -> "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
@@ -194,11 +194,15 @@ object AutoSchema {
       )
       addDescription(tpe, enumJson)
 
-    } else if (typeName == "scala.Option") {
+    } else if (typeName == "scala.Option" || typeName == "java.util.Optional") {
       // Option[T] becomes the schema of T with required set to false
       val jsonOption = JsObject("required" -> false) ++ createSchema(tpe.asInstanceOf[ru.TypeRefApi].args.head, previousTypes)
       addDescription(tpe, jsonOption)
-    } else if (tpe.baseClasses.contains(ru.symbolOf[MapLike[_, _, _]])) {
+    } else if (tpe.baseClasses.exists(s => s == ru.symbolOf[MapLike[_, _, _]]
+                                        || s == ru.symbolOf[java.util.Map[_, _]])) {
+      if (tpe.typeArgs.head.dealias != ru.typeOf[String].dealias) {
+        println("Maps with non-String keys not supported by JSONSchema... be warned...")
+      }
       val jsonMap = JsObject(
         "type" -> "object",
         "additionalProperties" -> createSchema(tpe.typeArgs(1))
@@ -208,6 +212,7 @@ object AutoSchema {
                                            s.fullName == "scala.Array" ||
                                            s.fullName == "scala.Seq" ||
                                            s.fullName == "scala.List" ||
+                                           s.fullName == "java.util.Collection" ||
                                            s.fullName == "scala.Vector")) {
       // (Traversable)[T] becomes a schema with items set to the schema of T
       val jsonSeq = JsObject("type" -> "array", "items" -> createSchema(tpe.asInstanceOf[ru.TypeRefApi].args.head, previousTypes))
