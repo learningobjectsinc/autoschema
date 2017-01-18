@@ -1,8 +1,14 @@
 package org.coursera.AutoSchema;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public class JavaType {
     private int _int;
-    private String _str;
+    private Map<String, Integer> _str2Int;
+    private List<Long> _jlist;
+    private Optional<String> _jopt;
 
     public int getInt() {
         return _int;
@@ -12,12 +18,28 @@ public class JavaType {
         this._int = _intVal;
     }
 
-    public String getStr() {
-        return _str;
+    public List<Long> getJlist() {
+        return _jlist;
     }
 
-    public void setStr(String _strVal) {
-        this._str = _strVal;
+    public void setJlist(List<Long> jlist) {
+        this._jlist = jlist;
+    }
+
+    public Optional<String> getJopt() {
+        return _jopt;
+    }
+
+    public void setJopt(Optional<String> _jopt) {
+        this._jopt = _jopt;
+    }
+
+    public Map<String, Integer> getStr2Int() {
+        return _str2Int;
+    }
+
+    public void setStr2Int(Map<String, Integer> _str2IntVal) {
+        this._str2Int = _str2IntVal;
     }
 }
 

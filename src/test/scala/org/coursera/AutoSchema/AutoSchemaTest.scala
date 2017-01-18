@@ -256,8 +256,22 @@ class AutoSchemaTest extends AssertionsForJUnit {
             "int" -> JsObject(
               "type" -> "number",
               "format" -> "number"),
-            "str" -> JsObject(
-              "type" -> "string"))))
+            "jlist" -> JsObject(
+              "type" -> "array",
+              "items" -> JsObject(
+                "type" -> "number",
+                "format" -> "number"
+              )
+            ),
+            "jopt" -> JsObject(
+              "required" -> false,
+              "type" -> "string"
+            ),
+            "str2Int" -> JsObject(
+              "type" -> "object",
+              "additionalProperties" -> JsObject(
+                "type" -> "number",
+                "format" -> "number")))))
   }
 
 
