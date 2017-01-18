@@ -1,5 +1,5 @@
 resolvers ++= Seq(
-  Resolver.url("LO Repo", url("https://learningobjects.artifactoryonline.com/learningobjects/repo"))(Resolver.ivyStylePatterns)
+  Resolver.url("LO Repo", url("https://learningobjects.jfrog.io/learningobjects/repo"))(Resolver.ivyStylePatterns)
 )
 
 //https://stash.difference-engine.com/projects/DE/repos/sbt-de-commons/browse
