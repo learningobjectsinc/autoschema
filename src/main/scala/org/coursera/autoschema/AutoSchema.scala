@@ -205,6 +205,7 @@ object AutoSchema {
       }
       val jsonMap = JsObject(
         "type" -> "object",
+        "properties" -> JsObject(),
         "additionalProperties" -> createSchema(tpe.typeArgs(1))
       )
       addDescription(tpe, jsonMap)

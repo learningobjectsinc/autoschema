@@ -230,6 +230,7 @@ class AutoSchemaTest extends AssertionsForJUnit {
         "properties" -> JsObject(
           "map" -> JsObject(
             "type" -> "object",
+            "properties" -> JsObject(),
             "additionalProperties" -> JsObject(
               "title" -> "TypeOne",
               "type" -> "object",
@@ -269,6 +270,7 @@ class AutoSchemaTest extends AssertionsForJUnit {
             ),
             "str2Int" -> JsObject(
               "type" -> "object",
+              "properties" -> JsObject(),
               "additionalProperties" -> JsObject(
                 "type" -> "number",
                 "format" -> "number")))))
