@@ -42,7 +42,7 @@ case class TypeFive(param1: TypeFiveParamOne, @Term.FormatAs("string") param2: T
 @ExposeAs(classOf[Int])
 case class TypeSixParamOne()
 case class TypeSixParamTwo()
-case class TypeSix(param1: TypeSixParamOne, @Term.ExposeAs(classOf[Int]) param2: TypeSixParamTwo)
+case class TypeSix(firstBit: TypeSixParamOne, @Term.ExposeAs(classOf[Int]) secondBit: TypeSixParamTwo)
 
 case class TypeSeven(param1: UUID)
 
@@ -71,10 +71,11 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeOne: Unit = {
     assert(createSchema[TypeOne] ===
       JsObject(
-        "title" -> "TypeOne",
+        "title" -> "Type One",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "number",
             "format" -> "number"))))
   }
@@ -83,13 +84,15 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeTwo: Unit = {
     assert(createSchema[TypeTwo] ===
       JsObject(
-        "title" -> "TypeTwo",
+        "title" -> "Type Two",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "number",
             "format" -> "number"),
           "param2" -> JsObject(
+            "title" -> "Param2",
             "type" -> "number",
             "format" -> "number"))))
   }
@@ -98,16 +101,18 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeThree: Unit = {
     assert(createSchema[TypeThree] ===
       JsObject(
-        "title" -> "TypeThree",
+        "title" -> "Type Three",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
-            "title" -> "TypeThreeParamOne",
+            "title" -> "Type Three Param One",
             "type" -> "object",
             "properties" -> JsObject(
               "param1" -> JsObject(
+                "title" -> "Param1",
                 "type" -> "string"))),
           "param2" -> JsObject(
+            "title" -> "Param2",
             "type" -> "number",
             "format" -> "number"))))
   }
@@ -116,10 +121,11 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeFour: Unit = {
     assert(createSchema[TypeFour] ===
       JsObject(
-        "title" -> "TypeFour",
+        "title" -> "Type Four",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "number",
             "format" -> "number"))))
   }
@@ -128,12 +134,14 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeFive: Unit = {
     assert(createSchema[TypeFive] ===
       JsObject(
-        "title" -> "TypeFive",
+        "title" -> "Type Five",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "string"),
           "param2" -> JsObject(
+            "title" -> "Param2",
             "type" -> "string"))))
   }
 
@@ -141,13 +149,15 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeSix: Unit = {
     assert(createSchema[TypeSix] ===
       JsObject(
-        "title" -> "TypeSix",
+        "title" -> "Type Six",
         "type" -> "object",
         "properties" -> JsObject(
-          "param1" -> JsObject(
+          "firstBit" -> JsObject(
+            "title" -> "First Bit",
             "type" -> "number",
             "format" -> "number"),
-          "param2" -> JsObject(
+          "secondBit" -> JsObject(
+            "title" -> "Second Bit",
             "type" -> "number",
             "format" -> "number"))))
   }
@@ -156,10 +166,11 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeSeven: Unit = {
     assert(createSchema[TypeSeven] ===
       JsObject(
-        "title" -> "TypeSeven",
+        "title" -> "Type Seven",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "string",
             "pattern" -> "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"))))
   }
@@ -212,10 +223,11 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def typeWithDescription: Unit = {
     assert(createSchema[TypeWithDescription] ===
       JsObject(
-        "title" -> "TypeWithDescription",
+        "title" -> "Type With Description",
         "type" -> "object",
         "properties" -> JsObject(
           "param1" -> JsObject(
+            "title" -> "Param1",
             "type" -> "string",
             "description" -> "Parameter description")),
         "description" -> "Type description"))
@@ -225,17 +237,19 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def mapType: Unit = {
     assert(createSchema[TypeWithMap] ===
       JsObject(
-        "title" -> "TypeWithMap",
+        "title" -> "Type With Map",
         "type" -> "object",
         "properties" -> JsObject(
           "map" -> JsObject(
+            "title" -> "Map",
             "type" -> "object",
             "properties" -> JsObject(),
             "additionalProperties" -> JsObject(
-              "title" -> "TypeOne",
+              "title" -> "Type One",
               "type" -> "object",
               "properties" -> JsObject(
                 "param1" -> JsObject(
+                  "title" -> "Param1",
                   "type" -> "number",
                   "format" -> "number"
                 )
@@ -251,13 +265,15 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def javaType: Unit = {
     assert(createSchema[JavaType] ===
         JsObject(
-          "title" -> "JavaType",
+          "title" -> "Java Type",
           "type" -> "object",
           "properties" -> JsObject(
             "int" -> JsObject(
+              "title" -> "Int",
               "type" -> "number",
               "format" -> "number"),
             "jlist" -> JsObject(
+              "title" -> "Jlist",
               "type" -> "array",
               "items" -> JsObject(
                 "type" -> "number",
@@ -265,11 +281,13 @@ class AutoSchemaTest extends AssertionsForJUnit {
               )
             ),
             "jopt" -> JsObject(
+              "title" -> "Jopt",
               "required" -> false,
               "type" -> "string"
             ),
             "str2Int" -> JsObject(
               "type" -> "object",
+              "title" -> "Str2Int",
               "properties" -> JsObject(),
               "additionalProperties" -> JsObject(
                 "type" -> "number",
@@ -281,10 +299,11 @@ class AutoSchemaTest extends AssertionsForJUnit {
   def javaTypeWithDescription: Unit = {
     assert(createSchema[JavaTypeWithDescription] ===
         JsObject(
-          "title" -> "JavaTypeWithDescription",
+          "title" -> "Java Type With Description",
           "type" -> "object",
           "properties" -> JsObject(
             "param" -> JsObject(
+              "title" -> "Param",
               "type" -> "string",
               "description" -> "Parameter description")),
           "description" -> "Type description"))
