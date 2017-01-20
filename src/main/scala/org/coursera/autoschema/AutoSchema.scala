@@ -121,10 +121,14 @@ object AutoSchema {
       case Nil          => ""
     }
 
+  private[this] val camel = "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z])|[A-Z](?=[A-Z]))".r
+  private[this] def nicify(name: String): String =
+    camel.replaceAllIn(name.capitalize, m => s"${m.matched} ")
+
   private[this] def createClassJson(tpe: ru.Type, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
     // Check if schema for this class has already been generated
     classSchemaCache.getOrElseUpdate(tpe.typeSymbol.fullName, {
-      val title = tpe.typeSymbol.name.decodedName.toString
+      val title = nicify(tpe.typeSymbol.name.decodedName.toString)
       val propertiesList: Seq[(String, JsonNode)] = tpe.members.flatMap { member =>
         if (member.isTerm && !isHidden(member.asTerm) && !(member.owner == ru.symbolOf[Object])) {
           val term = member.asTerm
@@ -144,12 +148,14 @@ object AutoSchema {
               }
 
             val description = term.annotations.find(isDescriptionAnnotation).flatMap(descriptionAnnotationJson)
-            val termFormatWithDescription = description match  {
-              case Some(value) => termFormat + value
-              case None => termFormat
-            }
+            val termFormatWithDescription = description.fold(termFormat)(termFormat + _)
 
-            name -> termFormatWithDescription
+            val termFormatDescriptionName =
+              if (termFormatWithDescription.get("title") eq null)
+                termFormatWithDescription + ("title" -> nicify(name))
+              else termFormatWithDescription
+
+            name -> termFormatDescriptionName
             }
         } else {
           None
