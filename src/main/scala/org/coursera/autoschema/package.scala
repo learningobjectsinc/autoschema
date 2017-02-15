@@ -1,10 +1,10 @@
-package org.coursera.autoschema
+package org.coursera
 
 import sun.reflect._
 
 import scala.reflect.api.{Mirror, Universe}
 
-private[autoschema] object refl {
+package object autoschema {
   import reflect.runtime.{universe => ru}
 
   @CallerSensitive
