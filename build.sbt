@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   JSON.Jackson.databind,
   JSON.Jackson.scala % "test",
   Scala.reflect(scalaVersion.value),
+  ScalaExtensions.enumeratum,
   Testing.scalaTest % "test",
   "com.novocode" % "junit-interface" % "0.11" % "test"
 )

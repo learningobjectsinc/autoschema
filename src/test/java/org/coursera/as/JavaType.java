@@ -1,4 +1,4 @@
-package org.coursera.AutoSchema;
+package org.coursera.as;
 
 import java.util.List;
 import java.util.Map;

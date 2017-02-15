@@ -23,6 +23,8 @@ import org.coursera.autoschema.jackson._
 import scala.collection.MapLike
 import scala.reflect.runtime.{universe => ru}
 
+import refl._
+
 /**
  * AutoSchema lets you take any Scala type and create JSON Schema out of it
  * @example
@@ -40,6 +42,8 @@ import scala.reflect.runtime.{universe => ru}
  * }}}
  */
 object AutoSchema {
+  private type Tag = ru.TypeTag[Any]
+
   // Hand written schemas for common types
   private[this] def schemaTypeForScala(implicit om: ObjectMapper): PartialFunction[String, JsObject] = {
     case "org.joda.time.DateTime" => JsObject("type" -> "string", "format" -> "date")
@@ -125,7 +129,8 @@ object AutoSchema {
   private[this] def nicify(name: String): String =
     camel.replaceAllIn(name.capitalize, m => s"${m.matched} ")
 
-  private[this] def createClassJson(tpe: ru.Type, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
+  private[this] def createClassJson(tag: Tag, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
+    val tpe = tag.tpe
     // Check if schema for this class has already been generated
     classSchemaCache.getOrElseUpdate(tpe.typeSymbol.fullName, {
       val title = nicify(tpe.typeSymbol.name.decodedName.toString)
@@ -143,8 +148,8 @@ object AutoSchema {
               .map(formatAnnotationJson)
               .getOrElse {
                 term.annotations.find(isExposeAnnotation)
-                  .map(annotation => createSchema(exposeAnnotationType(annotation), previousTypes))
-                  .getOrElse(createSchema(term.typeSignature.resultType, previousTypes + tpe.typeSymbol.fullName))
+                  .map(annotation => createSchema(rec(tag, exposeAnnotationType(annotation)), previousTypes))
+                  .getOrElse(createSchema(rec(tag, term.typeSignature.resultType), previousTypes + tpe.typeSymbol.fullName))
               }
 
             val description = term.annotations.find(isDescriptionAnnotation).flatMap(descriptionAnnotationJson)
@@ -181,14 +186,14 @@ object AutoSchema {
     }
   }
 
-  private[this] def createSchema(tpe: ru.Type, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
+  private[this] def createSchema(tag: Tag, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
+    val tpe = tag.tpe
     val typeName = tpe.typeSymbol.fullName
 
     if (extendsValue(tpe)) {
-      val mirror = ru.runtimeMirror(getClass.getClassLoader)
-      val enumName = tpe.toString.split('.').init.mkString(".")
-      val module = mirror.staticModule(enumName)
-      val enum = mirror.reflectModule(module).instance.asInstanceOf[Enumeration]
+      val ru.TypeRef(pre, _, _) = tpe
+      val module = pre.typeSymbol.asClass.module.asModule
+      val enum = tag.mirror.reflectModule(module).instance.asInstanceOf[Enumeration]
       val options = enum.values.map { v =>
         JsString(v.toString)
       }.toList
@@ -200,9 +205,26 @@ object AutoSchema {
       )
       addDescription(tpe, enumJson)
 
+    } else if (tpe.typeSymbol.isJavaEnum) {
+      val enumConstants = tpe.companion.decls.filter(d => d.isTerm && d.isJavaEnum).map(_.asTerm.name.decodedName.toString)
+      val enumJson = JsObject(
+        "type" -> "string",
+        "enum" -> JsArray(enumConstants.map(stringToNode).toList)
+      )
+      addDescription(tpe, enumJson)
+    } else if (tpe.baseClasses.exists(_.fullName == "enumeratum.EnumEntry")) {
+      val module = tpe.typeSymbol.companion.asModule
+      val enum = tag.mirror.reflectModule(module).instance.asInstanceOf[enumeratum.Enum[_ <: enumeratum.EnumEntry]]
+
+      val enumJson = JsObject(
+        "type" -> "string",
+        "enum" -> JsArray(enum.values.map(_.entryName: JsString).toList)
+      )
+      addDescription(tpe, enumJson)
+
     } else if (typeName == "scala.Option" || typeName == "java.util.Optional") {
       // Option[T] becomes the schema of T with required set to false
-      val jsonOption = JsObject("required" -> false) ++ createSchema(tpe.asInstanceOf[ru.TypeRefApi].args.head, previousTypes)
+      val jsonOption = JsObject("required" -> false) ++ createSchema(rec(tag, tpe.asInstanceOf[ru.TypeRefApi].args.head), previousTypes)
       addDescription(tpe, jsonOption)
     } else if (tpe.baseClasses.exists(s => s == ru.symbolOf[MapLike[_, _, _]]
                                         || s == ru.symbolOf[java.util.Map[_, _]])) {
@@ -222,14 +244,14 @@ object AutoSchema {
                                            s.fullName == "java.util.Collection" ||
                                            s.fullName == "scala.Vector")) {
       // (Traversable)[T] becomes a schema with items set to the schema of T
-      val jsonSeq = JsObject("type" -> "array", "items" -> createSchema(tpe.asInstanceOf[ru.TypeRefApi].args.head, previousTypes))
+      val jsonSeq = JsObject("type" -> "array", "items" -> createSchema(rec(tag, tpe.asInstanceOf[ru.TypeRefApi].args.head), previousTypes))
       addDescription(tpe, jsonSeq)
     } else {
       val jsonObj = tpe.typeSymbol.annotations.find(isFormatAnnotation)
         .map(formatAnnotationJson)
         .getOrElse {
         tpe.typeSymbol.annotations.find(isExposeAnnotation)
-          .map(annotation => createSchema(exposeAnnotationType(annotation), previousTypes))
+          .map(annotation => createSchema(rec(tag, exposeAnnotationType(annotation)), previousTypes))
           .getOrElse {
           schemaTypeForScala.applyOrElse(typeName, { (_: String) =>
             if (tpe.typeSymbol.isClass) {
@@ -238,7 +260,7 @@ object AutoSchema {
                 throw new IllegalArgumentException(s"Recursive types detected: $typeName")
               }
 
-              createClassJson(tpe, previousTypes)
+              createClassJson(rec(tag, tpe), previousTypes)
             } else {
               JsObject()
             }
@@ -257,7 +279,7 @@ object AutoSchema {
    * The JSON Schema for the type as a JsObject
    */
   def createSchema(tpe: ru.Type)(implicit om: ObjectMapper): JsObject =
-    createSchema(tpe, Set.empty[String])(om)
+    createSchema(mkTag(tpe), Set.empty[String])(om)
 
   /**
    *
