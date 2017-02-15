@@ -1,11 +1,11 @@
 package org.coursera.autoschema
 
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
-package object jackson {
+object jackson {
   /* --- Types --- */
   type JsArray   = ArrayNode
   type JsBoolean = BooleanNode

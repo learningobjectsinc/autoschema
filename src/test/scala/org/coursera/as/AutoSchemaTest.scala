@@ -14,17 +14,17 @@
  *  limitations under the License.
  */
 
-package org.coursera.AutoSchema
+package org.coursera.as
 
-import org.coursera.autoschema.AutoSchema.createSchema
-import org.coursera.autoschema.annotations._
-import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
-import org.coursera.autoschema.jackson._
 import java.util.UUID
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import org.coursera.autoschema.AutoSchema.createSchema
+import org.coursera.autoschema.annotations._
+import org.coursera.autoschema.jackson._
+import org.junit.Test
+import org.scalatest.junit.AssertionsForJUnit
 
 case class TypeOne(param1: Int)
 case class TypeTwo(param1: Int, param2: Long)
@@ -55,6 +55,24 @@ case class MutuallyRecursiveTypeTwo(param1: MutuallyRecursiveTypeOne)
 case class TypeWithDescription(@Term.Description("Parameter description") param1: String)
 
 case class TypeWithMap(map: Map[String, TypeOne])
+
+object ScalaEnum extends Enumeration { type ScalaEnum = Value; final val a, b = Value }
+
+sealed trait Enumeratum extends enumeratum.EnumEntry
+object Enumeratum extends enumeratum.Enum[Enumeratum] {
+  val values: Seq[Enumeratum] = findValues
+  case object E extends Enumeratum
+  case object Nu extends Enumeratum
+  case object Me extends Enumeratum
+  case object Ra extends Enumeratum
+  case object Tum extends Enumeratum
+}
+
+case class TypeWithJavaEnum(jenum: JavaEnum)
+
+case class TypeWithScEnum(scenum: ScalaEnum.ScalaEnum)
+
+case class TypeWithEnumeratum(enum: Enumeratum)
 
 class AutoSchemaTest extends AssertionsForJUnit {
   implicit val om: ObjectMapper = new ObjectMapper().registerModule(new DefaultScalaModule)
@@ -307,6 +325,57 @@ class AutoSchemaTest extends AssertionsForJUnit {
               "type" -> "string",
               "description" -> "Parameter description")),
           "description" -> "Type description"))
+  }
+
+  @Test
+  def typeWithJavaEnum: Unit = {
+    assert(createSchema[TypeWithJavaEnum] ===
+      JsObject(
+        "title" -> "Type With Java Enum",
+        "type" -> "object",
+        "properties" -> JsObject(
+          "jenum" -> JsObject(
+            "type" -> "string",
+            "title" -> "Jenum",
+            "enum" -> JsArray(List("ONE", "TWO", "RED", "BLUE"))
+          )
+        )
+      )
+    )
+  }
+
+  @Test
+  def typeWithScalaEnum: Unit = {
+    assert(createSchema[TypeWithScEnum] ===
+      JsObject(
+        "title" -> "Type With Sc Enum",
+        "type" -> "object",
+        "properties" -> JsObject(
+          "scenum" -> JsObject(
+            "type" -> "string",
+            "title" -> "Scenum",
+            "enum" -> JsArray(List("a", "b"))
+          )
+        )
+      )
+    )
+  }
+
+  @Test
+  def typeWithEnumeratum: Unit = {
+    assert(createSchema[TypeWithEnumeratum] ===
+      JsObject(
+        "title" -> "Type With Enumeratum",
+        "type" -> "object",
+        "properties" -> JsObject(
+          "enum" -> JsObject(
+            "type" -> "string",
+            "title" -> "Enum",
+            "enum" -> JsArray(List("E", "Nu", "Me", "Ra", "Tum"))
+          )
+        )
+      )
+    )
   }
 
 }
