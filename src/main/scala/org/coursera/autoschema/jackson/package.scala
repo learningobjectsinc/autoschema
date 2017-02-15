@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 
 import scala.collection.JavaConverters._
 
-object jackson {
+package object jackson {
   /* --- Types --- */
   type JsArray   = ArrayNode
   type JsBoolean = BooleanNode

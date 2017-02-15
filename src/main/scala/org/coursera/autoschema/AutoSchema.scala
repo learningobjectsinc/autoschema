@@ -23,8 +23,6 @@ import org.coursera.autoschema.jackson._
 import scala.collection.MapLike
 import scala.reflect.runtime.{universe => ru}
 
-import refl._
-
 /**
  * AutoSchema lets you take any Scala type and create JSON Schema out of it
  * @example
