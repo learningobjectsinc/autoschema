@@ -46,6 +46,10 @@ case class TypeSix(firstBit: TypeSixParamOne, @Term.ExposeAs(classOf[Int]) secon
 
 case class TypeSeven(param1: UUID)
 
+case class AuthoringWack(
+  `LO-2040-01_APPEASE_OCTOPODEAN_OVERLORDS`: Boolean
+)
+
 case class RecursiveType(param1: RecursiveType)
 
 case class MutuallyRecursiveTypeOne(param1: MutuallyRecursiveTypeTwo)
@@ -191,6 +195,18 @@ class AutoSchemaTest extends AssertionsForJUnit {
             "title" -> "Param1",
             "type" -> "string",
             "pattern" -> "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"))))
+  }
+
+  @Test
+  def wackThingThatAuthoringDo: Unit = {
+    assert(createSchema[AuthoringWack] ===
+      JsObject(
+        "title" -> "Authoring Wack",
+        "type"  -> "object",
+        "properties" -> JsObject(
+          "LO-2040-01_APPEASE_OCTOPODEAN_OVERLORDS" -> JsObject(
+            "title" -> "LO-2040-01 Appease Octopodean Overlords",
+            "type"  -> "boolean"))))
   }
 
   @Test

@@ -123,9 +123,16 @@ object AutoSchema {
       case Nil          => ""
     }
 
-  private[this] val camel = "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z])|[A-Z](?=[A-Z]))".r
-  private[this] def nicify(name: String): String =
-    camel.replaceAllIn(name.capitalize, m => s"${m.matched} ")
+  private[this] val camel = """([a-z](?=[A-Z]))""".r
+  private[this] val screamingSnake = """_([A-Z]+)""".r
+  private[this] def nicify(name: String): String = {
+    val desnaked =
+      screamingSnake.replaceAllIn(
+        name.capitalize,
+        m => s" ${m.group(1).toLowerCase.capitalize}"
+      )
+    camel.replaceAllIn(desnaked, m => s"${m.matched} ")
+  }
 
   private[this] def createClassJson(tag: Tag, previousTypes: Set[String])(implicit om: ObjectMapper): JsObject = {
     val tpe = tag.tpe
