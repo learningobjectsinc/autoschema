@@ -123,14 +123,13 @@ object AutoSchema {
       case Nil          => ""
     }
 
-  private[this] val camel = """([a-z](?=[A-Z]))""".r
-  private[this] val screamingSnake = """_([A-Z]+)""".r
+  private[this] val camel = "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))".r
+  private[this] val snakeScream = """ ([A-Z]+?)(?:(?= )|$)""".r
   private[this] def nicify(name: String): String = {
     val desnaked =
-      screamingSnake.replaceAllIn(
-        name.capitalize,
-        m => s" ${m.group(1).toLowerCase.capitalize}"
-      )
+      snakeScream.replaceAllIn(name.capitalize.replace('_', ' '),
+        m => {println(m.subgroups); s" ${m.group(1).toLowerCase.capitalize}"})
+    println(desnaked)
     camel.replaceAllIn(desnaked, m => s"${m.matched} ")
   }
 

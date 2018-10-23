@@ -47,7 +47,7 @@ case class TypeSix(firstBit: TypeSixParamOne, @Term.ExposeAs(classOf[Int]) secon
 case class TypeSeven(param1: UUID)
 
 case class AuthoringWack(
-  `LO-2040-01_APPEASE_OCTOPODEAN_OVERLORDS`: Boolean
+  `LO-2040-01_CBLPROD-883212_APPEASE_OCTOPODEAN_OVERLORDS`: Boolean
 )
 
 case class RecursiveType(param1: RecursiveType)
@@ -205,7 +205,7 @@ class AutoSchemaTest extends AssertionsForJUnit {
         "type"  -> "object",
         "properties" -> JsObject(
           "LO-2040-01_APPEASE_OCTOPODEAN_OVERLORDS" -> JsObject(
-            "title" -> "LO-2040-01 Appease Octopodean Overlords",
+            "title" -> "LO-2040-01 CBLPROD-883212 Appease Octopodean Overlords",
             "type"  -> "boolean"))))
   }
 
