@@ -6,7 +6,7 @@ name := "autoschema"
 
 organization := "com.learningobjects.org.coursera"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.10"
 
 scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-encoding", "utf8")
 
