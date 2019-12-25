@@ -1,6 +1,4 @@
-import com.learningobjects.sbt.libraries.Scala
-
-enablePlugins(DECommonSettings)
+// enablePlugins(DECommonSettings)
 
 name := "autoschema"
 
@@ -13,12 +11,13 @@ scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-encoding", "ut
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
 
 libraryDependencies ++= Seq(
-  JSON.Jackson.core,
-  JSON.Jackson.databind,
-  JSON.Jackson.scala % "test",
-  Scala.reflect(scalaVersion.value),
-  ScalaExtensions.enumeratum,
-  Testing.scalaTest % "test",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.9.10",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.10",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.10" % "test",
+  "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
+  "com.beachape" %% "enumeratum" % "1.5.13",
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
   "com.novocode" % "junit-interface" % "0.11" % "test"
 )
 

@@ -24,7 +24,7 @@ import org.coursera.autoschema.AutoSchema.createSchema
 import org.coursera.autoschema.annotations._
 import org.coursera.autoschema.jackson._
 import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatestplus.junit.AssertionsForJUnit
 
 case class TypeOne(param1: Int)
 case class TypeTwo(param1: Int, param2: Long)
@@ -64,7 +64,7 @@ object ScalaEnum extends Enumeration { type ScalaEnum = Value; final val a, b = 
 
 sealed trait Enumeratum extends enumeratum.EnumEntry
 object Enumeratum extends enumeratum.Enum[Enumeratum] {
-  val values: Seq[Enumeratum] = findValues
+  val values: collection.immutable.IndexedSeq[Enumeratum] = findValues
   case object E extends Enumeratum
   case object Nu extends Enumeratum
   case object Me extends Enumeratum
@@ -204,7 +204,7 @@ class AutoSchemaTest extends AssertionsForJUnit {
         "title" -> "Authoring Wack",
         "type"  -> "object",
         "properties" -> JsObject(
-          "LO-2040-01_APPEASE_OCTOPODEAN_OVERLORDS" -> JsObject(
+          "LO-2040-01_CBLPROD-883212_APPEASE_OCTOPODEAN_OVERLORDS" -> JsObject(
             "title" -> "LO-2040-01 CBLPROD-883212 Appease Octopodean Overlords",
             "type"  -> "boolean"))))
   }

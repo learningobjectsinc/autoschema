@@ -1,18 +1,17 @@
 package org.coursera
 
-import sun.reflect._
-
 import scala.reflect.api.{Mirror, Universe}
+
+import scala.compat.java8.StreamConverters._
 
 package object autoschema {
   import reflect.runtime.{universe => ru}
 
-  @CallerSensitive
+  // @CallerSensitive
   def mkTag(tpe: ru.Type): ru.TypeTag[Any] = {
-    val depth = new Throwable().getStackTrace.toStream
-      .indexWhere(elt => !(elt.getClassName startsWith "org.coursera.autoschema."))
-    val cl = Reflection.getCallerClass(depth).getClassLoader
-    SynTypeTag(tpe, ru.runtimeMirror(cl))
+    val cls = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+      .walk(_.toScala[Stream].map(_.getDeclaringClass).filterNot(_.getName startsWith "org.coursera.autoschema.").head): Class[_]
+    SynTypeTag(tpe, ru.runtimeMirror(cls.getClassLoader))
   }
 
   def rec(tag: ru.TypeTag[Any], tpe: ru.Type): ru.TypeTag[Any] =
